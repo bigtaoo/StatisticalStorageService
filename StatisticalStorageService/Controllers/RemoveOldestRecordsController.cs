@@ -19,22 +19,25 @@ namespace StatisticalStorageService.Controllers
         [HttpDelete("{n}")]
         public async Task<ActionResult<int>> RemoveOldestRecords(int n)
         {
+            // error input
             if(n <= 0)
             {
                 return 0;
             }
 
             var result = from r in context.LoadDatas orderby r.Id select r;
-            //var result = context.LoadDatas.OrderBy(context.LoadDatas.)
-            if (n >= result.Count())
+            var count = result.Count();
+            // large { n }, delete all
+            if (n >= count)
             {
                 context.LoadDatas.RemoveRange(context.LoadDatas);
                 await context.SaveChangesAsync();
-                return n;
+                return count;
             }
-
+            // delete oldest { n } value
             context.LoadDatas.RemoveRange(result.Take(n));
             await context.SaveChangesAsync();
+
             return n;
         }
     }

@@ -17,14 +17,22 @@ namespace StatisticalStorageService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReportLoadData>> PostReportLoadData(ReportLoadData data)
+        public async Task<ActionResult<LoadData>> PostReportLoadData(ReportLoadData data)
         {
-            context.LoadDatas.Add(new LoadData{ LoadValue = data.LoadValue, Timestamp = DateTime.Now }) ;
+            if(data.LoadValue < 0 || data.LoadValue > 100)
+            {
+                return BadRequest();
+            }
+
+            // store as a new LoadData.
+            var loadData = new LoadData { LoadValue = data.LoadValue, Timestamp = DateTime.Now };
+            context.LoadDatas.Add(loadData) ;
             await context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(PostReportLoadData), new { id = data.LoadValue }, data);
+            return loadData;
         }
 
+        // todo for test
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LoadData>>> GetLoadDatas()
         {
